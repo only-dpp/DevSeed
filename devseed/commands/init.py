@@ -45,12 +45,12 @@ def init(project_name: str = typer.Argument(...)) -> None:
     title("DevSeed Init")
 
     if base_path.exists():
-        abort(f'The directory "{project_name}" already exists.')
+        abort(f'O diretorio "{project_name}" ja existe.')
 
-    console.print(f'Creating project [bold cyan]"{project_name}"[/]...')
+    console.print(f'criando projeto[bold cyan]"{project_name}"[/]...')
     create_project_structure(base_path, project_name)
 
-    success(f'Project "{project_name}" created successfully.')
+    success(f'Projeto "{project_name}" criado com sucesso.')
 
     plain()
     console.print("[bold]Next steps:[/]")
