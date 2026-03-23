@@ -52,7 +52,8 @@ pycache/
 REQUIREMENTS_TEMPLATE = """fastapi
 uvicorn[standard]
 pytest
-""" 
+httpx
+"""
 
 PYPROJECT_TEMPLATE = """[project]
 name = "{project_name}"

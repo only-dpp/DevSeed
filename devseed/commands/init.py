@@ -23,7 +23,23 @@ def create_project_structure(base_path: Path, project_name: str) -> None:
 
     write_file(base_path / "app" / "__init__.py", "")
     write_file(base_path / "app" / "main.py", MAIN_TEMPLATE)
+
     write_file(base_path / "tests" / "__init__.py", "")
+    write_file(
+        base_path / "tests" / "test_main.py",
+        '''from fastapi.testclient import TestClient
+
+from app.main import app
+
+client = TestClient(app)
+
+
+def test_read_root():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.json() == {"message": "DevSeed project running"}
+''',
+    )
 
     write_file(base_path / ".env.example", ENV_EXAMPLE_TEMPLATE)
     write_file(base_path / ".gitignore", GITIGNORE_TEMPLATE)
