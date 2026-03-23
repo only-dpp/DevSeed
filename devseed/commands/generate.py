@@ -3,7 +3,7 @@ from pathlib import Path
 import typer
 
 from devseed.core.codegen import register_router_in_main
-from devseed.core.console import abort, console, section, success, title, warning
+from devseed.core.console import abort, console, next_step, section, success, title, warning
 from devseed.core.files import ensure_directory, write_file
 from devseed.core.project import is_valid_project
 
@@ -79,7 +79,10 @@ def generate_module(name: str) -> None:
     section("Gerando módulo")
 
     if not is_valid_project(base_path):
-        abort("Diretório atual não é um projeto válido do DevSeed.")
+        abort(
+            "Diretório atual não é um projeto válido do DevSeed.\n"
+            "Verifique se você está na raiz de um projeto criado com o DevSeed."
+        )
 
     module_name = create_module_files(base_path, name)
     success(f'Módulo "{module_name}" criado com sucesso.')
@@ -104,6 +107,4 @@ def generate_module(name: str) -> None:
     except FileExistsError:
         warning(f'O teste do módulo "{module_name}" já existe.')
 
-    console.print()
-    console.print("[bold]Próximo passo sugerido:[/]")
-    console.print("[cyan]python -m devseed run tests[/]")
+    next_step("python -m devseed run test", "executar os testes do projeto")

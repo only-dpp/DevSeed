@@ -45,3 +45,11 @@ def section(message: str) -> None:
 
 def plain(message: str = "") -> None:
     console.print(message)
+
+def next_step(command: str, description: str | None = None) -> None:
+    console.print()
+    console.print("[bold]Próximo passo sugerido:[/]")
+    if description:
+        console.print(f"[cyan]{command}[/]  → {description}")
+    else:
+        console.print(f"[cyan]{command}[/]")

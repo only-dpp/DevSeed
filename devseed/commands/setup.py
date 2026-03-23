@@ -1,13 +1,10 @@
 from pathlib import Path
-import sys
 import venv
 
 import typer
-from rich.console import Group
-from rich.panel import Panel
 
-from devseed.core.console import abort, console, section, success, title, warning
-from devseed.core.env import get_venv_pip, get_venv_python
+from devseed.core.console import abort, console, next_step, section, success, title, warning
+from devseed.core.env import get_venv_pip
 from devseed.core.files import copy_file_if_missing, file_exists
 from devseed.core.project import is_valid_project
 from devseed.core.shell import run_command
@@ -30,12 +27,12 @@ def install_dependencies(base_path: Path) -> None:
     requirements_file = base_path / "requirements.txt"
 
     if not file_exists(requirements_file):
-        abort("requirements.txt not found in the current directory.")
+        abort("Arquivo requirements.txt não encontrado no diretório atual.")
 
     pip_path = get_venv_pip(base_path)
 
     if not pip_path.exists():
-        abort("Could not find pip inside .venv.")
+        abort("Não foi possível localizar o pip dentro da .venv.")
 
     result = run_command(
         [str(pip_path), "install", "-r", str(requirements_file)],
@@ -43,8 +40,8 @@ def install_dependencies(base_path: Path) -> None:
     )
 
     if result.returncode != 0:
-        error_output = result.stderr.strip() or result.stdout.strip() or "Unknown pip error."
-        abort(f"Failed to install dependencies.\n{error_output}")
+        error_output = result.stderr.strip() or result.stdout.strip() or "Erro desconhecido ao instalar dependências."
+        abort(f"Falha ao instalar dependências.\n{error_output}")
 
 
 def ensure_env_file(base_path: Path) -> bool:
@@ -52,7 +49,7 @@ def ensure_env_file(base_path: Path) -> bool:
     env_file = base_path / ".env"
 
     if not file_exists(env_example):
-        abort(".env.example not found in the current directory.")
+        abort("Arquivo .env.example não encontrado no diretório atual.")
 
     return copy_file_if_missing(env_example, env_file)
 
@@ -64,27 +61,28 @@ def setup() -> None:
     title("DevSeed Setup")
 
     if not is_valid_project(base_path):
-        abort("Current directory is not a valid DevSeed project.")
+        abort(
+            "Diretório atual não é um projeto válido do DevSeed.\n"
+            "Verifique se você está na raiz de um projeto criado com o DevSeed."
+        )
 
-    section("Preparing environment")
+    section("Preparando ambiente")
 
     created_venv = create_virtualenv(base_path)
     if created_venv:
-        success("Virtual environment created.")
+        success("Ambiente virtual criado.")
     else:
-        warning("Virtual environment already exists. Skipping creation.")
+        warning("Ambiente virtual já existe.")
 
     install_dependencies(base_path)
-    success("Dependencies installed.")
+    success("Dependências instaladas.")
 
     created_env = ensure_env_file(base_path)
     if created_env:
-        success("Environment file created from .env.example.")
+        success("Arquivo .env criado a partir de .env.example.")
     else:
-        warning(".env already exists. Skipping creation.")
+        warning("Arquivo .env já existe.")
 
-    section("Summary")
-    console.print("[bold green]Environment setup completed.[/]")
-    console.print()
-    console.print("[bold]Suggested next step:[/]")
-    console.print("[cyan]python -m devseed run api[/]  → start the local API")
+    section("Resumo")
+    console.print("[bold green]Ambiente configurado com sucesso.[/]")
+    next_step("python -m devseed run api", "iniciar a API local")

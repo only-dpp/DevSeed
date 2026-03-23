@@ -1,7 +1,8 @@
-import typer
 from pathlib import Path
 
-from devseed.core.console import abort, console, plain, success, title
+import typer
+
+from devseed.core.console import abort, console, next_step, success, title
 from devseed.core.files import ensure_directory, write_file
 from devseed.core.paths import project_root
 from devseed.templates.python_api import (
@@ -61,16 +62,10 @@ def init(project_name: str = typer.Argument(...)) -> None:
     title("DevSeed Init")
 
     if base_path.exists():
-        abort(f'O diretorio "{project_name}" ja existe.')
+        abort(f'O diretório "{project_name}" já existe.')
 
-    console.print(f'criando projeto[bold cyan]"{project_name}"[/]...')
+    console.print(f'Criando projeto [bold cyan]"{project_name}"[/]...')
     create_project_structure(base_path, project_name)
 
     success(f'Projeto "{project_name}" criado com sucesso.')
-
-    plain()
-    console.print("[bold]Next steps:[/]")
-    console.print(f"[cyan]cd[/] {project_name}")
-    console.print("[cyan]devseed[/] doctor")
-    console.print("[cyan]devseed[/] setup")
-    console.print("[cyan]devseed[/] run api")
+    next_step(f"cd {project_name} && python -m devseed setup", "preparar o ambiente do projeto")
