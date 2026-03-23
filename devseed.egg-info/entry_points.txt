@@ -1,0 +1,2 @@
+[console_scripts]
+devseed = devseed.main:run
