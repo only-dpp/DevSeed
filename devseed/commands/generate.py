@@ -4,14 +4,11 @@ import typer
 
 from devseed.core.codegen import register_router_in_main
 from devseed.core.console import abort, console, next_step, section, success, title, warning
+from devseed.core.endpoints import append_endpoint_to_routes, normalize_name
 from devseed.core.files import ensure_directory, write_file
 from devseed.core.project import is_valid_project
 
 app = typer.Typer(help="Gera estruturas básicas de código.")
-
-
-def normalize_name(name: str) -> str:
-    return name.strip().lower().replace("-", "_").replace(" ", "_")
 
 
 def create_module_files(base_path: Path, module_name: str) -> str:
@@ -107,4 +104,37 @@ def generate_module(name: str) -> None:
     except FileExistsError:
         warning(f'O teste do módulo "{module_name}" já existe.')
 
-    next_step("python -m devseed run test", "executar os testes do projeto")
+    next_step("devseed run test", "executar os testes do projeto")
+
+
+@app.command("endpoint")
+def generate_endpoint(module: str, name: str) -> None:
+    base_path = Path.cwd()
+
+    title("DevSeed Generate")
+    section("Gerando endpoint")
+
+    if not is_valid_project(base_path):
+        abort(
+            "Diretório atual não é um projeto válido do DevSeed.\n"
+            "Verifique se você está na raiz de um projeto criado com o DevSeed."
+        )
+
+    module_name = normalize_name(module)
+    endpoint_name = normalize_name(name)
+
+    module_path = base_path / "app" / module_name
+    if not module_path.exists():
+        abort(f'O módulo "{module_name}" não existe em app/.')
+
+    try:
+        created = append_endpoint_to_routes(base_path, module_name, endpoint_name)
+    except FileNotFoundError as exc:
+        abort(str(exc))
+
+    if created:
+        success(f'Endpoint "{endpoint_name}" criado com sucesso no módulo "{module_name}".')
+    else:
+        warning(f'O endpoint "{endpoint_name}" já existe no módulo "{module_name}".')
+
+    next_step("devseed run api", "subir a API e testar o novo endpoint")
