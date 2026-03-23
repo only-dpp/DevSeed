@@ -1,12 +1,13 @@
 ## DevSeed
 
-CLI tool to bootstrap and manage Python backend projects.
+Ferramenta de linha de comando (CLI) para inicializar e gerenciar projetos backend em Python.
 
-### Features
-- Project initialization
-- Environment diagnostics
-- Automated setup
-- Development commands
+### Funcionalidades 
+
+Inicialização de projetos
+Diagnóstico de ambiente
+Configuração automatizada
+Comandos de desenvolvimento
 
 ### Status
-🚧 In active development
+Em desenvolvimento ativo
