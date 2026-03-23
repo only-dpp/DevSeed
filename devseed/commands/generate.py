@@ -13,6 +13,7 @@ from devseed.core.endpoints import (
 from devseed.core.files import ensure_directory, write_file
 from devseed.core.project import is_valid_project
 from devseed.core.testgen import append_endpoint_test
+from devseed.core.servicegen import append_service_function
 
 app = typer.Typer(help="Gera estruturas básicas de código.")
 
@@ -186,3 +187,18 @@ def generate_endpoint(
         warning(f'O teste do endpoint "{endpoint_name}" já existe.')
 
     next_step("devseed run test", "executar os testes do projeto")
+
+    try:
+        service_created = append_service_function(
+            base_path=base_path,
+            module_name=module_name,
+            endpoint_name=endpoint_name,
+            method=http_method,
+    )
+    except FileNotFoundError as exc:
+        abort(str(exc))
+
+    if service_created:
+        success("Função criada no service.py.")
+    else:
+        warning("Função já existia no service.py.")

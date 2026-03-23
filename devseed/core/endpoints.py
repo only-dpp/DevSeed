@@ -25,13 +25,32 @@ def build_endpoint_function_name(module_name: str, endpoint_name: str, http_meth
     return f"{http_method}_{module_name}_{endpoint_name}"
 
 
+def build_service_import(module_name: str, function_name: str) -> str:
+    return f"from app.{module_name}.service import {function_name}"
+
+
 def build_endpoint_function(module_name: str, endpoint_name: str, http_method: str) -> str:
     function_name = build_endpoint_function_name(module_name, endpoint_name, http_method)
 
     return f"""@router.{http_method}("/{endpoint_name}")
-def {function_name}():
-    return {{"endpoint": "{endpoint_name}", "module": "{module_name}", "method": "{http_method}"}}
+def {endpoint_name}():
+    return {function_name}()
 """
+
+
+def insert_import_if_missing(content: str, import_line: str) -> str:
+    if import_line in content:
+        return content
+
+    lines = content.splitlines()
+
+    insert_index = 0
+    for index, line in enumerate(lines):
+        if line.startswith("from ") or line.startswith("import "):
+            insert_index = index + 1
+
+    lines.insert(insert_index, import_line)
+    return "\n".join(lines)
 
 
 def append_endpoint_to_routes(
@@ -50,8 +69,11 @@ def append_endpoint_to_routes(
     route_line = build_endpoint_route_line(http_method, endpoint_name)
     function_name = build_endpoint_function_name(module_name, endpoint_name, http_method)
 
-    if route_line in content or f"def {function_name}():" in content:
+    if route_line in content or f"def {endpoint_name}():" in content:
         return False
+
+    import_line = build_service_import(module_name, function_name)
+    content = insert_import_if_missing(content, import_line)
 
     endpoint_block = build_endpoint_function(module_name, endpoint_name, http_method)
 
