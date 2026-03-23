@@ -76,3 +76,10 @@ def run_tests() -> None:
         console.print("[yellow]Test execution interrupted by user.[/]")
     except subprocess.CalledProcessError:
         abort("Tests failed.")
+
+@app.command("test")
+def run_test_alias() -> None:
+    """
+    Alias para 'tests'
+    """
+    run_tests()

@@ -14,7 +14,7 @@ def normalize_name(name: str) -> str:
     return name.strip().lower().replace("-", "_").replace(" ", "_")
 
 
-def create_module(base_path: Path, module_name: str) -> str:
+def create_module_files(base_path: Path, module_name: str) -> str:
     normalized_name = normalize_name(module_name)
     module_path = base_path / "app" / normalized_name
 
@@ -51,6 +51,26 @@ def list_{normalized_name}():
     return normalized_name
 
 
+def create_module_test(base_path: Path, module_name: str) -> None:
+    test_file = base_path / "tests" / f"test_{module_name}.py"
+
+    write_file(
+        test_file,
+        f'''from fastapi.testclient import TestClient
+
+from app.main import app
+
+client = TestClient(app)
+
+
+def test_list_{module_name}():
+    response = client.get("/{module_name}")
+    assert response.status_code == 200
+    assert response.json() == {{"module": "{module_name}"}}
+''',
+    )
+
+
 @app.command("module")
 def generate_module(name: str) -> None:
     base_path = Path.cwd()
@@ -61,7 +81,7 @@ def generate_module(name: str) -> None:
     if not is_valid_project(base_path):
         abort("Diretório atual não é um projeto válido do DevSeed.")
 
-    module_name = create_module(base_path, name)
+    module_name = create_module_files(base_path, name)
     success(f'Módulo "{module_name}" criado com sucesso.')
 
     try:
@@ -78,6 +98,12 @@ def generate_module(name: str) -> None:
     else:
         warning(f'O router do módulo "{module_name}" não foi registrado automaticamente.')
 
+    try:
+        create_module_test(base_path, module_name)
+        success(f'Teste do módulo "{module_name}" criado com sucesso.')
+    except FileExistsError:
+        warning(f'O teste do módulo "{module_name}" já existe.')
+
     console.print()
     console.print("[bold]Próximo passo sugerido:[/]")
-    console.print("[cyan]python -m devseed run api[/]")
+    console.print("[cyan]python -m devseed run tests[/]")
