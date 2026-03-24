@@ -79,7 +79,7 @@ python -m devseed --help
 ### 1. Criar projeto
 ```bash
 devseed init nome-da-sua-api
-cd 'nome da sua api'
+cd nome da sua api
 ```
 
 ### 2. Preparar ambiente 
@@ -92,6 +92,7 @@ devseed setup
 devseed run api
 ```
 
+## Amostra do processo:
 ![init](/docs/iniciando%20api.png)
 
 
@@ -111,6 +112,7 @@ isso gera automaticamente:
     schemas(para métodos editaveis)
     teste
 
+### Amostra do processo:
 ![generate](/docs/generate.png)
 
 
@@ -119,6 +121,7 @@ isso gera automaticamente:
 devseed run test
 ```
 
+### Amostra do processo:
 ![run-test](/docs/run-test.png)
 
 ### Estrutura gerada
