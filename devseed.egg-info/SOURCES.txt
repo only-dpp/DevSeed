@@ -1,6 +1,7 @@
 README.md
 pyproject.toml
 devseed/__init__.py
+devseed/__main__.py
 devseed/cli.py
 devseed/main.py
 devseed.egg-info/PKG-INFO
@@ -17,10 +18,18 @@ devseed/commands/run.py
 devseed/commands/setup.py
 devseed/core/__init__.py
 devseed/core/checks.py
+devseed/core/codegen.py
 devseed/core/console.py
 devseed/core/constants.py
+devseed/core/endpoints.py
+devseed/core/env.py
 devseed/core/files.py
 devseed/core/paths.py
+devseed/core/project.py
+devseed/core/schemagen.py
+devseed/core/servicegen.py
 devseed/core/shell.py
+devseed/core/testgen.py
 devseed/templates/__init__.py
 devseed/templates/python_api.py
+tests/test_main.py
