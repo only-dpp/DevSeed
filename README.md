@@ -2,7 +2,7 @@
 
 ![banner](/docs/devseed-banner.png)
 
-![Python](https://img.shields.io/badge/python-3.10+-3776AB?logo=python&logoColor=white)
+![Python](https://img.shields.io/badge/python-3.13.12-3776AB?logo=python&logoColor=white)
 
 CLI para criação e estruturação inicial de projetos backend em Python.
 
