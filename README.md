@@ -54,10 +54,22 @@ Ele entrega uma base sólida. **A evolução do seu projeto é de sua responsabi
 
 ##  Instalação
 
+clone o repositório
 ```bash
-pip install devseed #ainda não funcional desta forma
+git clone https://github.com/only-dpp/DevSeed.git
 ```
-ou rodando localmente:
+
+instale o pacote em modo editável
+```bash
+pip install -e .
+```
+
+rode o --help:
+```bash
+devseed --help
+```
+
+caso seu python não esteja no path use:
 ```bash
 python -m devseed --help
 ```
