@@ -14,6 +14,7 @@ from devseed.core.files import ensure_directory, write_file
 from devseed.core.project import is_valid_project
 from devseed.core.testgen import append_endpoint_test
 from devseed.core.servicegen import append_service_function
+from devseed.core.schemagen import append_schema_class, method_requires_schema
 
 app = typer.Typer(help="Gera estruturas básicas de código.")
 
@@ -146,12 +147,32 @@ def generate_endpoint(
     if not module_path.exists():
         abort(f'O módulo "{module_name}" não existe em app/.')
 
+    schema_class_name = None
+    schema_created = False
+
+    if method_requires_schema(http_method):
+        try:
+            schema_created, schema_class_name = append_schema_class(
+                base_path=base_path,
+                module_name=module_name,
+                endpoint_name=endpoint_name,
+                method=http_method,
+            )
+        except FileNotFoundError as exc:
+            abort(str(exc))
+
+        if schema_created:
+            success(f'Schema "{schema_class_name}" criado com sucesso.')
+        else:
+            warning(f'Schema "{schema_class_name}" já existe.')
+
     try:
         created = append_endpoint_to_routes(
             base_path=base_path,
             module_name=module_name,
             endpoint_name=endpoint_name,
             http_method=http_method,
+            schema_class_name=schema_class_name,
         )
     except FileNotFoundError as exc:
         abort(str(exc))
@@ -166,6 +187,22 @@ def generate_endpoint(
             f'O endpoint "{endpoint_name}" [{http_method.upper()}] '
             f'já existe no módulo "{module_name}".'
         )
+
+    try:
+        service_created = append_service_function(
+            base_path=base_path,
+            module_name=module_name,
+            endpoint_name=endpoint_name,
+            method=http_method,
+            use_payload=method_requires_schema(http_method),
+        )
+    except FileNotFoundError as exc:
+        abort(str(exc))
+
+    if service_created:
+        success("Função criada no service.py.")
+    else:
+        warning("Função já existia no service.py.")
 
     try:
         test_created = append_endpoint_test(
@@ -187,18 +224,3 @@ def generate_endpoint(
         warning(f'O teste do endpoint "{endpoint_name}" já existe.')
 
     next_step("devseed run test", "executar os testes do projeto")
-
-    try:
-        service_created = append_service_function(
-            base_path=base_path,
-            module_name=module_name,
-            endpoint_name=endpoint_name,
-            method=http_method,
-    )
-    except FileNotFoundError as exc:
-        abort(str(exc))
-
-    if service_created:
-        success("Função criada no service.py.")
-    else:
-        warning("Função já existia no service.py.")

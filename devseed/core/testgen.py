@@ -1,10 +1,27 @@
 from pathlib import Path
 
 from devseed.core.files import file_exists
+from devseed.core.schemagen import method_requires_schema
 
 
 def build_endpoint_test_function(module_name: str, endpoint_name: str, http_method: str) -> str:
     function_name = f"test_{http_method}_{module_name}_{endpoint_name}"
+
+    if method_requires_schema(http_method):
+        return f'''
+def {function_name}():
+    response = client.{http_method}(
+        "/{module_name}/{endpoint_name}",
+        json={{"example_field": "valor_teste"}}
+    )
+    assert response.status_code == 200
+    assert response.json() == {{
+        "endpoint": "{endpoint_name}",
+        "module": "{module_name}",
+        "method": "{http_method}",
+        "payload": {{"example_field": "valor_teste"}}
+    }}
+'''
 
     return f'''
 def {function_name}():
